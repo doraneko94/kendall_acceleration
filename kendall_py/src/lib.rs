@@ -2,6 +2,11 @@ use kendall;
 use pyo3::prelude::*;
 
 #[pyfunction]
+fn tau_raw(x: Vec<f64>, y: Vec<f64>) -> PyResult<f64> {
+    Ok(kendall::tau_raw(&x, &y).unwrap())
+}
+
+#[pyfunction]
 fn tau(x: Vec<f64>, y: Vec<f64>) -> PyResult<f64> {
     Ok(kendall::tau(&x, &y).unwrap())
 }
@@ -43,6 +48,7 @@ fn zb_zero(x: Vec<f64>, y: Vec<f64>) -> PyResult<f64> {
 
 #[pymodule]
 fn kendall_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(tau_raw, m)?)?;
     m.add_function(wrap_pyfunction!(tau, m)?)?;
     m.add_function(wrap_pyfunction!(zb, m)?)?;
     m.add_function(wrap_pyfunction!(tau_avltree, m)?)?;
