@@ -18,6 +18,28 @@ impl FloatHash {
     pub fn new(f: f64) -> Self { Self { value: f.to_bits() } }
 }
 
+pub fn tau_raw(x: &[f64], y: &[f64]) -> Option<f64> {
+    let n = x.len();
+    if n != y.len() || n < 2 { return None; }
+    let (mut kp, mut kn, mut n1, mut n2) = (0i128, 0i128, 0i128, 0i128);
+    for i in 0..n {
+        for j in i+1..n {
+            let xy = (x[i] - x[j]) * (y[i] - y[j]);
+            if xy == 0.0 {
+                if x[i] == x[j] { n1 += 1; }
+                if y[i] == y[j] { n2 += 1; }
+            } 
+            else if xy > 0.0 { kp += 1; }
+            else { kn += 1; }
+        }
+    }
+    let n0 = n as i128 * (n as i128 - 1) / 2;
+    let num = (kp - kn) as f64;
+    let den = (((n0 - n1) * (n0 - n2)) as f64).sqrt();
+
+    Some(safe_div(num, den))
+}
+
 fn kendall_core(x: &[f64], y: &[f64], t: &mut HashMap<FloatHash, i128>, u: &mut HashMap<FloatHash, i128>) -> Option<(i128, i128, i128)> {
     let n = x.len();
     if n != y.len() || n < 2 { return None; }
